@@ -6,12 +6,15 @@ class Command(BaseCommand):
     help = 'Populate the octofit_db database with test data'
 
     def handle(self, *args, **kwargs):
-        # Clear existing data
-        Leaderboard.objects.all().delete()
-        Activity.objects.all().delete()
-        User.objects.all().delete()
-        Team.objects.all().delete()
-        Workout.objects.all().delete()
+
+        # Drop collections using Djongo's database connection
+        from django.db import connection
+        db = connection.cursor().db_conn.client['octofit_db']
+        db['leaderboard'].drop()
+        db['activities'].drop()
+        db['workouts'].drop()
+        db['users'].drop()
+        db['teams'].drop()
 
         # Create teams
         marvel = Team.objects.create(name='Marvel')
